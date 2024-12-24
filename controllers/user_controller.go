@@ -49,17 +49,16 @@ func (ctrl *UserController) RegisterCheck(c *gin.Context) {
 }
 
 func (ctrl *UserController) RegisterConfirm(c *gin.Context) {
-	var user models.User
-	if err := c.Bind(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
-		return
-	}
+	name := c.PostForm("name")
+	password := c.PostForm("password")
+	phone := c.PostForm("phonenumber")
 
+	var user models.User
+	user.UserName = name
+	user.Password = password
+	user.Phone = phone
 	user.IsChanged = 0
-	if err := ctrl.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
-		return
-	}
+	ctrl.DB.Save(&user)
 
 	c.String(http.StatusOK, "saved")
 }
